@@ -3,18 +3,27 @@ package com.epam.mentoring.gateway;
 import com.epam.mentoring.gateway.balancer.RibbonConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.ribbon.RibbonClient;
-import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 @EnableEurekaClient
-@EnableFeignClients
 @RibbonClient(name = "gateway", configuration = RibbonConfiguration.class)
 public class GatewayApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(GatewayApplication.class, args);
+	}
+
+	@Bean
+	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+		return builder.routes()
+				.route("product-service", r -> r.path("/product*", "/product/**")
+						.uri("lb://PRODUCT-SERVICE"))
+				.build();
 	}
 
 }
