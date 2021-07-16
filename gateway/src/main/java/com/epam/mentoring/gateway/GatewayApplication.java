@@ -21,9 +21,20 @@ public class GatewayApplication {
 	@Bean
 	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
 		return builder.routes()
-				.route("product-service", r -> r.path("/product*", "/product/**")
-						.uri("lb://PRODUCT-SERVICE"))
+				.route(r -> r.path("/product/**")
+						.uri("lb://PRODUCT-SERVICE")
+						.id("productModule"))
+				.route(r -> r.path("/group/**")
+						.uri("lb://PRODUCT-SERVICE")
+						.id("groupModule"))
+				.route(r -> r.path("/cart/**")
+						.uri("lb://BACKEND-SERVICE")
+						.id("cartModule"))
+				.route(r -> r.path("/order/**")
+						.uri("lb://BACKEND-SERVICE")
+						.id("orderModule"))
 				.build();
+
 	}
 
 }
