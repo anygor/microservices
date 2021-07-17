@@ -1,6 +1,5 @@
 package com.epam.mentoring.gateway.balancer;
 
-import com.netflix.loadbalancer.BestAvailableRule;
 import com.netflix.loadbalancer.IPing;
 import com.netflix.loadbalancer.IRule;
 import com.netflix.loadbalancer.PingUrl;
@@ -17,6 +16,6 @@ public class RibbonConfiguration {
 
     @Bean
     public IRule ribbonRule() {
-        return new BestAvailableRule();
+        return new CustomBalanceRule();
     }
 }
