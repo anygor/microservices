@@ -38,7 +38,6 @@ public class ProductController {
 
   @GetMapping
   public List<Product> index() {
-    logger.info("Я логгирую текст в контроллере, до которого не могу дойти");
     return productService.getProducts();
   }
 
@@ -49,7 +48,7 @@ public class ProductController {
 
   @GetMapping("/{id}")
   public Product view(@PathVariable("id") long id) {
-    logger.info("Я логгирую текст в контроллере, до которого не могу дойти");
+
     return productService.getProduct(id);
   }
 
