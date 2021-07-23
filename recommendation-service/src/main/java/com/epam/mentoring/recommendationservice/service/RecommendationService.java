@@ -8,13 +8,13 @@ import java.util.List;
 
 @Service
 public class RecommendationService {
-	public List<Long> getRecommendedProductIds(Product product) {
+	public List<Long> getRecommendedProductIds(Long productId) {
 		LinkedList<Long> ids = new LinkedList<>();
 		ids.add(1L);
 		ids.add(4L);
 		ids.add(8L);
 		ids.add(8L);
-		ids.add(product.getId());
+		ids.add(productId);
 		return ids;
 	}
 }

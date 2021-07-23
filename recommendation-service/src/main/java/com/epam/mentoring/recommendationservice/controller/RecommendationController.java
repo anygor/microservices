@@ -13,9 +13,9 @@ public class RecommendationController {
 	@Autowired
 	private RecommendationService recommendationService;
 
-	@RequestMapping(value = "/recommend", method = RequestMethod.POST)
+	@RequestMapping(value = "/recommend", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Long> recommend(@RequestBody Product product) {
-		return recommendationService.getRecommendedProductIds(product);
+	public List<Long> recommend(@RequestParam long productId) {
+		return recommendationService.getRecommendedProductIds(productId);
 	}
 }

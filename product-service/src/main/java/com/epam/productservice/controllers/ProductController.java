@@ -1,5 +1,6 @@
 package com.epam.productservice.controllers;
 
+import com.epam.productservice.feign.RecommendationFeignClient;
 import com.epam.productservice.models.Product;
 import com.epam.productservice.models.ProductImage;
 import com.epam.productservice.services.ProductService;
@@ -17,7 +18,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/product")
@@ -28,6 +34,9 @@ public class ProductController {
   @Autowired private StorageService storageService;
 
   @Autowired Validator productValidator;
+
+  @Autowired
+  private RecommendationFeignClient recommendationFeignClient;
 
   private static final Logger logger = LogManager.getLogger(ProductController.class);
 
@@ -47,9 +56,12 @@ public class ProductController {
   }
 
   @GetMapping("/{id}")
-  public Product view(@PathVariable("id") long id) {
-
-    return productService.getProduct(id);
+  public Map<String, List> view(@PathVariable("id") long id) {
+    List<Long> recommendedProductIds = recommendationFeignClient.getRecommendedProductIds(id);
+    Map<String, List> result = new HashMap<>();
+    result.put("product", Stream.of(productService.getProduct(id)).collect(Collectors.toList()));
+    result.put("recommendations", Stream.of(recommendationFeignClient.getRecommendedProductIds(id)).collect(Collectors.toList()));
+    return result;
   }
 
   @PostMapping(value = "/{id}")
