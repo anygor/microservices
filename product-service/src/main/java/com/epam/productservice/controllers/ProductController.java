@@ -63,16 +63,20 @@ public class ProductController {
   @GetMapping("/{id}")
   public Map<String, List> view(@PathVariable("id") long id) {
     String productKey = "product";
-    String recommendationsKey = "recommendations";
     Map<String, List> result = new HashMap<>();
     result.put(productKey, Stream.of(productService.getProduct(id)).collect(Collectors.toList()));
+    putRecommendationsOfProductToMap(id, result);
+    return result;
+  }
+
+  private void putRecommendationsOfProductToMap(long id, Map<String, List> result) {
+    String recommendationsKey = "recommendations";
     try {
       List<Long> recommendedProductIds = recommendationFeignClient.getRecommendedProductIds(id);
       result.put(recommendationsKey, Stream.of(recommendedProductIds).collect(Collectors.toList()));
-    } catch (Throwable e) {
+    } catch (Exception e) {
       result.put(recommendationsKey, Stream.of(1L, 2L, 3L).collect(Collectors.toList()));
     }
-    return result;
   }
 
   @PostMapping(value = "/{id}")

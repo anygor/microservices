@@ -1,6 +1,5 @@
 package com.epam.mentoring.recommendationservice.controller;
 
-import com.epam.mentoring.recommendationservice.model.Product;
 import com.epam.mentoring.recommendationservice.service.RecommendationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
