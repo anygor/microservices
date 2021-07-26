@@ -10,19 +10,20 @@ import java.util.List;
 @Service
 public class EcommerceService {
 
-    @Autowired
-    OrderRepository orderRepository;
+	@Autowired
+	OrderRepository orderRepository;
 
 
+	/* ORDERS */
+	public List<Order> getOrders() {
+		return orderRepository.findAll();
+	}
 
-    /* ORDERS */
-    public List<Order> getOrders(){
-        return orderRepository.findAll();
-    }
-    public Order getOrder(long id){
-        return orderRepository.findById(id).get();
-    }
-    public Order saveOrder(Order order){
-        return orderRepository.save(order);
-    }
+	public Order getOrder(long id) {
+		return orderRepository.findById(id).get();
+	}
+
+	public Order saveOrder(Order order) {
+		return orderRepository.save(order);
+	}
 }

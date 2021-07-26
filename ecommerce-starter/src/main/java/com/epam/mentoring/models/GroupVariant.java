@@ -9,42 +9,42 @@ import javax.persistence.*;
 @Table(name = "group_variants")
 public class GroupVariant {
 
-    private long id;
-    private String variantName;
-    private ProductGroup group;
+	private long id;
+	private String variantName;
+	private ProductGroup group;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public long getId() {
-        return id;
-    }
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	public long getId() {
+		return id;
+	}
 
-    public void setId(long id) {
-        this.id = id;
-    }
+	public void setId(long id) {
+		this.id = id;
+	}
 
-    @Column(name = "variant_name")
-    public String getVariantName() {
-        return variantName;
-    }
+	@Column(name = "variant_name")
+	public String getVariantName() {
+		return variantName;
+	}
 
-    public void setVariantName(String variantName) {
-        this.variantName = variantName;
-    }
+	public void setVariantName(String variantName) {
+		this.variantName = variantName;
+	}
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id")
-    @JsonBackReference
-    @JsonIgnore
-    public ProductGroup getGroup() {
-        return group;
-    }
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "group_id")
+	@JsonBackReference
+	@JsonIgnore
+	public ProductGroup getGroup() {
+		return group;
+	}
 
-    public void setGroup(ProductGroup group) {
-        this.group = group;
-    }
+	public void setGroup(ProductGroup group) {
+		this.group = group;
+	}
 
-    public String toString() {
-        return getVariantName();
-    }
+	public String toString() {
+		return getVariantName();
+	}
 }

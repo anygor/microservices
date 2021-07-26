@@ -15,23 +15,23 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @Configuration
 @EnableSwagger2
 public class MySwaggerConfig {
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.any())
+	@Bean
+	public Docket api() {
+		return new Docket(DocumentationType.SWAGGER_2)
+				.select()
+				.apis(RequestHandlerSelectors.any())
 //                .paths(PathSelectors.any())
-                .paths(paths())
-                .build();
-    }
+				.paths(paths())
+				.build();
+	}
 
-    private Predicate<String> paths() {
-        return or(
-                regex("/product.*"),
-                regex("/group.*"),
-                regex("/order.*"),
+	private Predicate<String> paths() {
+		return or(
+				regex("/product.*"),
+				regex("/group.*"),
+				regex("/order.*"),
 //                regex("/cart.*"),
 //                regex("/springsRestController.*"),
-                regex("/cart.*"));
-    }
+				regex("/cart.*"));
+	}
 }

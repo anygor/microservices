@@ -24,27 +24,27 @@ import java.util.stream.Collectors;
 
 public class CustomBalanceRule extends WeightedResponseTimeRule {
 
-    private static final Logger logger = LogManager.getLogger(CustomBalanceRule.class);
+	private static final Logger logger = LogManager.getLogger(CustomBalanceRule.class);
 
-    private String getHeader() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        Enumeration<String> headerNames = request.getHeaderNames();
-        return request.getHeader("routingKey");
-    }
+	private String getHeader() {
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		Enumeration<String> headerNames = request.getHeaderNames();
+		return request.getHeader("routingKey");
+	}
 
-    @Override
-    public Server choose(Object key) {
-        List<DiscoveryEnabledServer> allServers = getLoadBalancer().getAllServers().
-                stream().map(server -> (DiscoveryEnabledServer) server).
-                filter(discoveryEnabledServer -> discoveryEnabledServer.getInstanceInfo().getStatus().equals(InstanceInfo.InstanceStatus.UP))
-                .collect(Collectors.toList());
-        String header = this.getHeader();
-        if (header != null) {
-            int serviceIndex = Integer.parseInt(header.substring(1));
-            if (allServers.size() >= serviceIndex) {
-                return allServers.get(serviceIndex - 1);
-            }
-        }
-        return super.choose(key);
-    }
+	@Override
+	public Server choose(Object key) {
+		List<DiscoveryEnabledServer> allServers = getLoadBalancer().getAllServers().
+				stream().map(server -> (DiscoveryEnabledServer) server).
+				filter(discoveryEnabledServer -> discoveryEnabledServer.getInstanceInfo().getStatus().equals(InstanceInfo.InstanceStatus.UP))
+				.collect(Collectors.toList());
+		String header = this.getHeader();
+		if (header != null) {
+			int serviceIndex = Integer.parseInt(header.substring(1));
+			if (allServers.size() >= serviceIndex) {
+				return allServers.get(serviceIndex - 1);
+			}
+		}
+		return super.choose(key);
+	}
 }

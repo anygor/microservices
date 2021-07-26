@@ -18,32 +18,32 @@ import java.util.stream.Collectors;
 
 public class CustomBalanceRule extends BestAvailableRule {
 
-    private static final Logger logger = LogManager.getLogger(CustomBalanceRule.class);
+	private static final Logger logger = LogManager.getLogger(CustomBalanceRule.class);
 
-    private String getHeader() {
-        RequestContext currentContext = RequestContext.getCurrentContext();
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (requestAttributes instanceof ServletRequestAttributes) {
-            HttpServletRequest request = ((ServletRequestAttributes)requestAttributes).getRequest();
-            return request.getHeader("routingKey");
-        }
-        logger.debug("Not called in the context of an HTTP request");
-        return null;
-    }
+	private String getHeader() {
+		RequestContext currentContext = RequestContext.getCurrentContext();
+		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+		if (requestAttributes instanceof ServletRequestAttributes) {
+			HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+			return request.getHeader("routingKey");
+		}
+		logger.debug("Not called in the context of an HTTP request");
+		return null;
+	}
 
-    @Override
-    public Server choose(Object key) {
-        List<DiscoveryEnabledServer> allServers = getLoadBalancer().getAllServers().
-                stream().map(server -> (DiscoveryEnabledServer) server).
-                filter(discoveryEnabledServer -> discoveryEnabledServer.getInstanceInfo().getStatus().equals(InstanceInfo.InstanceStatus.UP))
-                .collect(Collectors.toList());
-        String header = this.getHeader();
-        if (header != null) {
-            Optional<DiscoveryEnabledServer> discoveryEnabledServerOptional = allServers.stream().filter(server -> server.getInstanceInfo().getMetadata().get("routingKey").equals(header)).findAny();
-            if (discoveryEnabledServerOptional.isPresent()) {
-                return discoveryEnabledServerOptional.get();
-            }
-        }
-        return super.choose(key);
-    }
+	@Override
+	public Server choose(Object key) {
+		List<DiscoveryEnabledServer> allServers = getLoadBalancer().getAllServers().
+				stream().map(server -> (DiscoveryEnabledServer) server).
+				filter(discoveryEnabledServer -> discoveryEnabledServer.getInstanceInfo().getStatus().equals(InstanceInfo.InstanceStatus.UP))
+				.collect(Collectors.toList());
+		String header = this.getHeader();
+		if (header != null) {
+			Optional<DiscoveryEnabledServer> discoveryEnabledServerOptional = allServers.stream().filter(server -> server.getInstanceInfo().getMetadata().get("routingKey").equals(header)).findAny();
+			if (discoveryEnabledServerOptional.isPresent()) {
+				return discoveryEnabledServerOptional.get();
+			}
+		}
+		return super.choose(key);
+	}
 }

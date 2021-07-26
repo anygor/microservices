@@ -11,13 +11,13 @@ import org.springframework.context.annotation.Configuration;
 @RibbonClient(name = "PRODUCT-SERVICE", configuration = RibbonConfiguration.class)
 public class RibbonConfiguration {
 
-    @Bean
-    public IPing ribbonPing() {
-        return new PingUrl();
-    }
+	@Bean
+	public IPing ribbonPing() {
+		return new PingUrl();
+	}
 
-    @Bean
-    public IRule ribbonRule() {
-        return new CustomBalanceRule();
-    }
+	@Bean
+	public IRule ribbonRule() {
+		return new CustomBalanceRule();
+	}
 }

@@ -9,6 +9,7 @@ All inputs and outputs use JSON format.
 **To open Swagger (interactive) API documentation, navigate your browser to [YOUR-URL]/swagger-ui.html**
 
 To start docker-container with Mysql server instance type in command line:
+
 ```
 docker run --name mysql_ecommerce -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=ecommerce mysql:latest
 ```

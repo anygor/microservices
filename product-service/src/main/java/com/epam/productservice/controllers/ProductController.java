@@ -34,114 +34,117 @@ import java.util.stream.Stream;
 @RequestMapping("/product")
 public class ProductController {
 
-  @Autowired private ProductService productService;
+	@Autowired
+	private ProductService productService;
 
-  @Autowired private StorageService storageService;
+	@Autowired
+	private StorageService storageService;
 
-  @Autowired Validator productValidator;
+	@Autowired
+	Validator productValidator;
 
-  @Autowired
-  private RecommendationFeignClient recommendationFeignClient;
+	@Autowired
+	private RecommendationFeignClient recommendationFeignClient;
 
-  private static final Logger logger = LogManager.getLogger(ProductController.class);
+	private static final Logger logger = LogManager.getLogger(ProductController.class);
 
-  @InitBinder
-  protected void initBinder(WebDataBinder binder) {
-    binder.addValidators(productValidator);
-  }
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+		binder.addValidators(productValidator);
+	}
 
-  @GetMapping
-  public List<Product> index() {
-    return productService.getProducts();
-  }
+	@GetMapping
+	public List<Product> index() {
+		return productService.getProducts();
+	}
 
-  @PostMapping
-  public Product create(@RequestBody @Valid Product product) {
-    return productService.saveProduct(product);
-  }
+	@PostMapping
+	public Product create(@RequestBody @Valid Product product) {
+		return productService.saveProduct(product);
+	}
 
-  @GetMapping("/{id}")
-  public Map<String, List> view(@PathVariable("id") long id) {
-    String productKey = "product";
-    Map<String, List> result = new HashMap<>();
-    result.put(productKey, Stream.of(productService.getProduct(id)).collect(Collectors.toList()));
-    putRecommendationsOfProductToMap(id, result);
-    return result;
-  }
+	@GetMapping("/{id}")
+	public Map<String, List> view(@PathVariable("id") long id) {
+		String productKey = "product";
+		Map<String, List> result = new HashMap<>();
+		result.put(productKey, Stream.of(productService.getProduct(id)).collect(Collectors.toList()));
+		putRecommendationsOfProductToMap(id, result);
+		return result;
+	}
 
-  private void putRecommendationsOfProductToMap(long id, Map<String, List> result) {
-    String recommendationsKey = "recommendations";
-    try {
-      List<Long> recommendedProductIds = recommendationFeignClient.getRecommendedProductIds(id);
-      result.put(recommendationsKey, Stream.of(recommendedProductIds).collect(Collectors.toList()));
-    } catch (Exception e) {
-      result.put(recommendationsKey, Stream.of(1L, 2L, 3L).collect(Collectors.toList()));
-    }
-  }
+	private void putRecommendationsOfProductToMap(long id, Map<String, List> result) {
+		String recommendationsKey = "recommendations";
+		try {
+			List<Long> recommendedProductIds = recommendationFeignClient.getRecommendedProductIds(id);
+			result.put(recommendationsKey, Stream.of(recommendedProductIds).collect(Collectors.toList()));
+		} catch (Exception e) {
+			result.put(recommendationsKey, Stream.of(1L, 2L, 3L).collect(Collectors.toList()));
+		}
+	}
 
-  @PostMapping(value = "/{id}")
-  public Product edit(@PathVariable("id") long id, @RequestBody @Valid Product product) {
+	@PostMapping(value = "/{id}")
+	public Product edit(@PathVariable("id") long id, @RequestBody @Valid Product product) {
 
-    Product updatedProduct = productService.getProduct(id);
+		Product updatedProduct = productService.getProduct(id);
 
-    if (updatedProduct == null) {
-      return null;
-    }
+		if (updatedProduct == null) {
+			return null;
+		}
 
-    updatedProduct.setName(product.getName());
-    updatedProduct.setPrice(product.getPrice());
-    updatedProduct.setDescription(product.getDescription());
+		updatedProduct.setName(product.getName());
+		updatedProduct.setPrice(product.getPrice());
+		updatedProduct.setDescription(product.getDescription());
 
-    return productService.saveProduct(updatedProduct);
-  }
+		return productService.saveProduct(updatedProduct);
+	}
 
-  @GetMapping("/{id}/images")
-  public List<ProductImage> viewImages(@PathVariable("id") String productId) {
-    //Session session = sessionFactory.openSession();
-    //List<ProductImage> list =
-    //    session
-    //        .createQuery("FROM ProductImage WHERE product_id = :product_id")
-    //        .setLong("product_id", Long.parseLong(productId))
-    //        .list();
-    //session.close();
-    //return list;
-    return productService.getAllProductImage(Long.parseLong(productId));
-  }
+	@GetMapping("/{id}/images")
+	public List<ProductImage> viewImages(@PathVariable("id") String productId) {
+		//Session session = sessionFactory.openSession();
+		//List<ProductImage> list =
+		//    session
+		//        .createQuery("FROM ProductImage WHERE product_id = :product_id")
+		//        .setLong("product_id", Long.parseLong(productId))
+		//        .list();
+		//session.close();
+		//return list;
+		return productService.getAllProductImage(Long.parseLong(productId));
+	}
 
-  @GetMapping("/image/{id}")
-  @ResponseBody
-  public ResponseEntity<Resource> serveFile(@PathVariable("id") String id) {
+	@GetMapping("/image/{id}")
+	@ResponseBody
+	public ResponseEntity<Resource> serveFile(@PathVariable("id") String id) {
 
-    ProductImage image = productService.getProductImage(Integer.parseInt(id));
+		ProductImage image = productService.getProductImage(Integer.parseInt(id));
 
-    // Relative path to StorageProperties.rootLocation
-    String path = "product-images/" + image.getProductId() + "/";
+		// Relative path to StorageProperties.rootLocation
+		String path = "product-images/" + image.getProductId() + "/";
 
-    Resource file = storageService.loadAsResource(path + image.getPath());
-    String mimeType = "image/png";
-    try {
-      mimeType = file.getURL().openConnection().getContentType();
-    } catch (IOException e) {
-      System.out.println("Can't get file mimeType. " + e.getMessage());
-    }
-    return ResponseEntity.ok()
-        //                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;
-        // filename=\""+file.getFilename()+"\"")
-        .header(HttpHeaders.CONTENT_TYPE, mimeType)
-        .body(file);
-  }
+		Resource file = storageService.loadAsResource(path + image.getPath());
+		String mimeType = "image/png";
+		try {
+			mimeType = file.getURL().openConnection().getContentType();
+		} catch (IOException e) {
+			System.out.println("Can't get file mimeType. " + e.getMessage());
+		}
+		return ResponseEntity.ok()
+				//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;
+				// filename=\""+file.getFilename()+"\"")
+				.header(HttpHeaders.CONTENT_TYPE, mimeType)
+				.body(file);
+	}
 
-  @PostMapping("/{id}/uploadimage")
-  public ProductImage handleFileUpload(
-      @PathVariable("id") String id, @RequestParam("file") MultipartFile file) {
+	@PostMapping("/{id}/uploadimage")
+	public ProductImage handleFileUpload(
+			@PathVariable("id") String id, @RequestParam("file") MultipartFile file) {
 
-    // Relative path to the rootLocation in storageService
-    String path = "/product-images/" + id;
-    String filename = storageService.store(file, path);
+		// Relative path to the rootLocation in storageService
+		String path = "/product-images/" + id;
+		String filename = storageService.store(file, path);
 
-    return productService.addProductImage(id, filename);
-  }
+		return productService.addProductImage(id, filename);
+	}
 
-  // Todo: add delete method
+	// Todo: add delete method
 
 }

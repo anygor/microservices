@@ -16,21 +16,21 @@ import org.springframework.validation.Validator;
 @EnableConfigurationProperties(StorageProperties.class)
 public class EcommerceStarterApplication {
 
-  public static void main(String[] args) {
-    SpringApplication.run(EcommerceStarterApplication.class, args);
-  }
+	public static void main(String[] args) {
+		SpringApplication.run(EcommerceStarterApplication.class, args);
+	}
 
-  @Bean
-  CommandLineRunner init(StorageService storageService) {
-    return (args) -> {
-      //			storageService.deleteAll();
-      storageService.init();
-    };
-  }
+	@Bean
+	CommandLineRunner init(StorageService storageService) {
+		return (args) -> {
+			//			storageService.deleteAll();
+			storageService.init();
+		};
+	}
 
-  @Bean
-  public Validator orderValidator() {
-    return new OrderValidator();
-  }
+	@Bean
+	public Validator orderValidator() {
+		return new OrderValidator();
+	}
 
 }

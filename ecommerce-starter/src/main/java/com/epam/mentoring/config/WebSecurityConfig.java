@@ -18,48 +18,48 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	public BCryptPasswordEncoder bCryptPasswordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
-    @Bean
-    public TokenAuthenticationFilter jwtAuthenticationTokenFilter() throws Exception {
-        return new TokenAuthenticationFilter();
-    }
+	@Bean
+	public TokenAuthenticationFilter jwtAuthenticationTokenFilter() throws Exception {
+		return new TokenAuthenticationFilter();
+	}
 
-    @Autowired
-    private AuthenticationSuccessHandler authenticationSuccessHandler;
+	@Autowired
+	private AuthenticationSuccessHandler authenticationSuccessHandler;
 
-    @Autowired
-    private AuthenticationFailureHandler authenticationFailureHandler;
+	@Autowired
+	private AuthenticationFailureHandler authenticationFailureHandler;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception{
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
 
-        http
+		http
 //                .exceptionHandling().authenticationEntryPoint( restAuthenticationEntryPoint ).and()
 //                .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS ).and()
-                .addFilterBefore(jwtAuthenticationTokenFilter(), BasicAuthenticationFilter.class)
-                .authorizeRequests()
-                .antMatchers("/product/image/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/product/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/group/**").permitAll()
-                .antMatchers("/cart/**").permitAll()
-                .antMatchers("/v2/**").permitAll()
-                .antMatchers("/swagger-ui.html").permitAll()
-                .antMatchers("/webjars/**").permitAll()
-                .antMatchers("/swagger-resources/**").permitAll()
+				.addFilterBefore(jwtAuthenticationTokenFilter(), BasicAuthenticationFilter.class)
+				.authorizeRequests()
+				.antMatchers("/product/image/**").permitAll()
+				.antMatchers(HttpMethod.GET, "/product/**").permitAll()
+				.antMatchers(HttpMethod.GET, "/group/**").permitAll()
+				.antMatchers("/cart/**").permitAll()
+				.antMatchers("/v2/**").permitAll()
+				.antMatchers("/swagger-ui.html").permitAll()
+				.antMatchers("/webjars/**").permitAll()
+				.antMatchers("/swagger-resources/**").permitAll()
 
-                .anyRequest().authenticated()
+				.anyRequest().authenticated()
 //                .anyRequest().hasRole("admin") << Works with ROLE entities while we have SimpleGrantedAuthority...
 //                .anyRequest().hasAuthority("admin")
 
 //               .httpBasic().disable();
-                .and().formLogin().successHandler(authenticationSuccessHandler)
-                .failureHandler(authenticationFailureHandler)
+				.and().formLogin().successHandler(authenticationSuccessHandler)
+				.failureHandler(authenticationFailureHandler)
 
-                // From https://github.com/bfwg/springboot-jwt-starter
-                .and().csrf().disable();
-    }
+				// From https://github.com/bfwg/springboot-jwt-starter
+				.and().csrf().disable();
+	}
 }
