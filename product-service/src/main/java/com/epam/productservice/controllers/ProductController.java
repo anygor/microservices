@@ -5,6 +5,9 @@ import com.epam.productservice.models.Product;
 import com.epam.productservice.models.ProductImage;
 import com.epam.productservice.services.ProductService;
 import com.epam.productservice.storage.StorageService;
+import com.netflix.client.ClientException;
+import feign.FeignException;
+import feign.RetryableException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +21,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 @RestController
@@ -57,10 +62,16 @@ public class ProductController {
 
   @GetMapping("/{id}")
   public Map<String, List> view(@PathVariable("id") long id) {
-    List<Long> recommendedProductIds = recommendationFeignClient.getRecommendedProductIds(id);
+    String productKey = "product";
+    String recommendationsKey = "recommendations";
     Map<String, List> result = new HashMap<>();
-    result.put("product", Stream.of(productService.getProduct(id)).collect(Collectors.toList()));
-    result.put("recommendations", Stream.of(recommendationFeignClient.getRecommendedProductIds(id)).collect(Collectors.toList()));
+    result.put(productKey, Stream.of(productService.getProduct(id)).collect(Collectors.toList()));
+    try {
+      List<Long> recommendedProductIds = recommendationFeignClient.getRecommendedProductIds(id);
+      result.put(recommendationsKey, Stream.of(recommendedProductIds).collect(Collectors.toList()));
+    } catch (Throwable e) {
+      result.put(recommendationsKey, Stream.of(1L, 2L, 3L).collect(Collectors.toList()));
+    }
     return result;
   }
 
