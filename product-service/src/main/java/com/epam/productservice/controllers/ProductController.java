@@ -5,9 +5,6 @@ import com.epam.productservice.models.Product;
 import com.epam.productservice.models.ProductImage;
 import com.epam.productservice.services.ProductService;
 import com.epam.productservice.storage.StorageService;
-import com.netflix.client.ClientException;
-import feign.FeignException;
-import feign.RetryableException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.net.SocketTimeoutException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 @RestController
@@ -68,19 +62,26 @@ public class ProductController {
 		String productKey = "product";
 		Map<String, List> result = new HashMap<>();
 		result.put(productKey, Stream.of(productService.getProduct(id)).collect(Collectors.toList()));
-		putRecommendationsOfProductToMap(id, result);
+		String recommendationsKey = "recommendations";
+
+		List<Long> recommendedProductIds = recommendationFeignClient.getRecommendedProductIds(id);
+		result.put(recommendationsKey, Stream.of(recommendedProductIds).collect(Collectors.toList()));
+
 		return result;
 	}
 
-	private void putRecommendationsOfProductToMap(long id, Map<String, List> result) {
-		String recommendationsKey = "recommendations";
-		try {
-			List<Long> recommendedProductIds = recommendationFeignClient.getRecommendedProductIds(id);
-			result.put(recommendationsKey, Stream.of(recommendedProductIds).collect(Collectors.toList()));
-		} catch (Exception e) {
-			result.put(recommendationsKey, Stream.of(1L, 2L, 3L).collect(Collectors.toList()));
-		}
-	}
+
+//	private Map<String, List> putRecommendationsOfProductToMap(@PathVariable("id") long id) {
+//		String productKey = "product";
+//		Map<String, List> result = new HashMap<>();
+//		result.put(productKey, Stream.of(productService.getProduct(id)).collect(Collectors.toList()));
+//		String recommendationsKey = "recommendations";
+//
+//		List<Long> recommendedProductIds = recommendationFeignClient.getRecommendedProductIds(id);
+//		result.put(recommendationsKey, Stream.of(1L, 2L, 3L).collect(Collectors.toList()));
+//
+//		return result;
+//	}
 
 	@PostMapping(value = "/{id}")
 	public Product edit(@PathVariable("id") long id, @RequestBody @Valid Product product) {
