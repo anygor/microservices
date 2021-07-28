@@ -1,8 +1,11 @@
 package com.epam.productservice.controllers;
 
 import com.epam.productservice.feign.RecommendationFeignClient;
+import com.epam.productservice.feign.StatisticsFeignClient;
 import com.epam.productservice.models.Product;
 import com.epam.productservice.models.ProductImage;
+import com.epam.productservice.models.User;
+import com.epam.productservice.models.stats.StatisticsUnit;
 import com.epam.productservice.services.ProductService;
 import com.epam.productservice.storage.StorageService;
 import org.apache.logging.log4j.LogManager;
@@ -40,6 +43,9 @@ public class ProductController {
 	@Autowired
 	private RecommendationFeignClient recommendationFeignClient;
 
+	@Autowired
+	private StatisticsFeignClient statisticsFeignClient;
+
 	private static final Logger logger = LogManager.getLogger(ProductController.class);
 
 	@InitBinder
@@ -61,12 +67,15 @@ public class ProductController {
 	public Map<String, List> view(@PathVariable("id") long id) {
 		String productKey = "product";
 		Map<String, List> result = new HashMap<>();
-		result.put(productKey, Stream.of(productService.getProduct(id)).collect(Collectors.toList()));
+		Product product = productService.getProduct(id);
+		result.put(productKey, Stream.of(product).collect(Collectors.toList()));
 		String recommendationsKey = "recommendations";
 
 		List<Long> recommendedProductIds = recommendationFeignClient.getRecommendedProductIds(id);
 		result.put(recommendationsKey, Stream.of(recommendedProductIds).collect(Collectors.toList()));
 
+		statisticsFeignClient.addStats(new StatisticsUnit(null, product));
+		List<StatisticsUnit> stats = statisticsFeignClient.getStats();
 		return result;
 	}
 
